@@ -36,6 +36,8 @@ const parseBody = (request, response, handler) => {
 const handlePost = (request, response, parsedUrl) => {
     if (parsedUrl.pathname === '/addUser') {
         parseBody(request, response, jsonHandler.addUser);
+    } else {
+        jsonHandler.notFound(request, response);
     }
 };
 
@@ -45,8 +47,10 @@ const handleGet = (request, response, parsedUrl) => {
         htmlHandler.getCSS(request, response);
     } else if (parsedUrl.pathname === '/getUsers') {
         jsonHandler.getUsers(request, response);
-    } else {
+    } else if (parsedUrl.pathname === '/') {
         htmlHandler.getIndex(request, response);
+    } else {
+        jsonHandler.notFound(request, response);
     }
 };
 

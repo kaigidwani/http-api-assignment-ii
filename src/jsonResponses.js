@@ -66,8 +66,21 @@ const addUser = (request, response) => {
     return respondJSON(request, response, responseCode, {});
 };
 
+// function for 404 not found requests with message
+const notFound = (request, response) => {
+    // create error message for response
+    const responseJSON = {
+        message: 'The page you are looking for was not found.',
+        id: 'notFound',
+    };
+
+    // return a 404 with an error message
+    respondJSON(request, response, 404, responseJSON);
+};
+
 // public exports
 module.exports = {
     getUsers,
     addUser,
+    notFound,
 };
