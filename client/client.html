@@ -7,7 +7,7 @@
   <script>
     //Handles our FETCH response. This function is async because it
     //contains an await.
-    const handleResponse = async (response) => {
+    const handleResponse = async (response, parseResponse = true) => {
       //Grab the content section
       const content = document.querySelector('#content');
 
@@ -30,13 +30,19 @@
           break;
       }
 
-      //Parse the response to json. This works because we know the server always
-      //sends back json. Await because .json() is an async function.
-      const obj = await response.json();
-      
-      //If we have a message, display it.
-      if(obj.message){
-        content.innerHTML += `<p>${obj.message}</p>`;
+
+      if(parseResponse) {
+        //Parse the response to json. This works because we know the server always
+        //sends back json. Await because .json() is an async function.
+        const obj = await response.json();
+        
+        //If we have a message, display it.
+        if(obj.message){
+          content.innerHTML += `<p>${obj.message}</p>`;
+        }
+        if(obj.users) {
+          content.innerHTML += `<p>${JSON.stringify(obj.users)}</p>`;
+        }
       }
     };
 
@@ -70,10 +76,25 @@
       handleResponse(response);
     };
 
+    const sendFetchRequest = async (form) => {
+      const url = form.querySelector('#urlField').value;
+      const method = form.querySelector('#methodSelect').value;
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+
+      handleResponse(response, method === 'get');
+    };
+
     //Init function is called when window.onload runs (set below).
     const init = () => {
       //Grab the form
       const nameForm = document.querySelector('#nameForm');
+      const userForm = document.querySelector('#userForm');
       
       //Create an addUser function that cancels the forms default action and
       //calls our sendPost function above.
@@ -82,9 +103,16 @@
         sendPost(nameForm);
         return false;
       }
+
+      const sendUser = (e) => {
+        e.preventDefault();
+        sendFetchRequest(userForm);
+        return false;
+      };
       
       //Call addUser when the submit event fires on the form.
       nameForm.addEventListener('submit', addUser);
+      userForm.addEventListener('submit', sendUser);
     };
 
     //When the window loads, run init.
